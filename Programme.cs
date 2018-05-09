@@ -43,6 +43,7 @@ namespace DLLDiffTool
                 List<string> dllsPaths1 = new List<string>();
                 dllsPaths1.Add(oneESDllPath);
                 dllsPaths1.Add(cdmBuildDllPath);
+                Console.WriteLine();
                 Console.WriteLine("Analysis Started.... ");
                 //IEnumerable<System.IO.FileInfo> list1 = dir.Getfile("*.dll", System.IO.SearchOption.AllDirectories);
                 // List out dlls which are present not in CDMBuild folder                
@@ -77,8 +78,8 @@ namespace DLLDiffTool
                         string length = GetFileSizeInKB(dllpath);
                         string temp_txt_Location = ILCodePath_1ES + @"\" + dll_txt_Name;
                         string strCmdText = @"ildasm /tok /byt " + dllpath + @" /out=" + temp_txt_Location;
-                        Console.WriteLine();
-                        Console.WriteLine("Comparing {0}", filename);
+                        //Console.WriteLine();
+                        //Console.WriteLine("Comparing {0}", filename);
                         flag4 = true;
                         //Creating process which can Convert DLL to ILCODE(in Text format)
                         DllToILCode(p, strCmdText, IldasmToolPath, driveLetter);
@@ -93,8 +94,8 @@ namespace DLLDiffTool
                         string length = GetFileSizeInKB(dllpath);
                         string temp_txt_Location = ILCodePath_CDMBuild + @"\" + dll_txt_Name;
                         string strCmdText = @"ildasm /tok /byt " + dllpath + @" /out=" + temp_txt_Location;
-                        Console.WriteLine();
-                        Console.WriteLine("Comparing {0}", filename);
+                        //Console.WriteLine();
+                        //Console.WriteLine("Comparing {0}", filename);
                         flag4 = true;
                         //Creating process which can Convert DLL to ILCODE(in Text format)
                         DllToILCode(p, strCmdText, IldasmToolPath, driveLetter);
