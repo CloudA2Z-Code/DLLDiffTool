@@ -1,0 +1,6 @@
+
+SET var=%cd%
+cmd /K "%var%\DLLDiffTool\DLLDiffTool\bin\Debug\DLLDiffTool.exe"
+
+SET cdir=%cd%
+powershell.exe -Command "Start-Process cmd \"/K "%cdir%\DLLDiffTool\DLLDiffTool\bin\Debug\DLLDiffTool.exe"\" -Verb RunAs"
