@@ -1,0 +1,90 @@
+$basePath = $PSScriptRoot
+if ([string]::IsNullOrEmpty($basePath))
+{
+    $basePath = Split-Path -parent $psISE.CurrentFile.Fullpath
+}
+
+# different test assemblies - it makes a difference wrt .deps.json so there are two netstandard tests here
+#$asm_netstdWithDepsJson = $basePath + '\bin\Debug\netstandard2.0\ICSharpCode.Decompiler.Powershell.dll'
+#$asm_netstd = $basePath + '\bin\Debug\netstandard2.0\ICSharpCode.Decompiler.dll'
+
+$V20_CDMBUILD_DLL_2 = $basePath + '\frmabhdishek\CDMBuild\Microsoft.EnterpriseManagement.Cryptography.dll'
+$V20_1ES_DLL_2 = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Cryptography.dll'
+
+$V20_DLL_1ES = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Reporting.Code.dll'
+$V20_DLL_CDMBuild = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Reporting.Code.dll'
+
+$dllTargetFMversion = [Reflection.Assembly]::ReflectionOnlyLoadFrom($V20_DLL_1ES).ImageRuntimeVersion
+Write-host –NoNewLine "DLL target Framework : " $dllTargetFMversion
+
+
+$decompiler1 = Get-Decompiler $V20_DLL_CDMBuild
+$classes1 = Get-DecompiledTypes $decompiler1 -Types class
+$classHL_CDM = @{}
+$count1 = 0
+foreach ($c in $classes1)
+{
+    $classHL_CDM.add($count1,$c.FullName)
+    $count1++
+}
+
+#$classHL.Keys | % { "key = $_ , value = " + $classHL.Item($_) }
+
+$classHL_CDM
+
+
+
+$decompiler2 = Get-Decompiler $V20_DLL_1ES
+$classes2 = Get-DecompiledTypes $decompiler1 -Types class
+$classHL_1ES = @{}
+$count2 = 0
+foreach ($c in $classes2)
+{
+    $classHL_1ES.add($count2,$c.FullName)
+    $count2++
+}
+$classHL_1ES
+
+ForEach ($objectA in $classHL_1ES.values) 
+{
+"1ES Entity: $objectA.Item($_)"
+:outer
+ ForEach ($objectB in $classHL_CDM.values) 
+ {
+ if ($objectA -eq $objectB) 
+   {
+           #"Same Code ! in $objectB"
+           break :outer
+           #Write-host –NoNewLine "strings are equal" 
+   }
+   else
+   {
+        #Write-host –NoNewLine "strings are unequal" $objectA + $objectB
+        "Unequal Code ! $objectB"
+   }
+ }
+}
+
+foreach ($objectA in @("a", "e", "i")) {
+    "objectA: $objectA"
+    :outer
+    foreach ($objectB in @("a", "b", "c", "d", "e")) {
+       if ($objectB -eq $objectA) {
+           "hit! $objectB"
+           break :outer
+       } else { "miss! $objectB" }
+    }
+}
+
+#foreach ($kvp in $var.GetEnumerator()) {
+#    $key = $kvp.Key
+#    $val = $kvp.Value
+#}
+
+
+$classHL_CDM.Keys | Where-Object { 
+    ($_ -notin $classHL_1ES.Keys) -or ($classHL_CDM.$_ -ne $bootOrder2.$_) 
+}
+
+$classHL_CDM = $null
+$classHL_1ES = $null
