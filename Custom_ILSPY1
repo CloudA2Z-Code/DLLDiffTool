@@ -1,0 +1,60 @@
+$V20_DLL_CDMBuild = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Reporting.Code.dll'
+
+$dllTargetFMversion = [Reflection.Assembly]::ReflectionOnlyLoadFrom($V20_DLL_1ES).ImageRuntimeVersion
+Write-host –NoNewLine "DLL target Framework : " $dllTargetFMversion
+
+
+$decompiler1 = Get-Decompiler $V20_CDMBUILD_DLL_2
+$classes1 = Get-DecompiledTypes $decompiler1 -Types class
+$classHL_CDM = @{}
+$count1 = 0
+foreach ($c in $classes1)
+{
+    $classHL_CDM.add($count1,$c.FullName)
+    $count1++
+}
+
+#$classHL.Keys | % { "key = $_ , value = " + $classHL.Item($_) }
+
+$classHL_CDM
+
+
+
+$decompiler2 = Get-Decompiler $V20_1ES_DLL_2
+$classes2 = Get-DecompiledTypes $decompiler1 -Types class
+$classHL_1ES = @{}
+$count2 = 0
+foreach ($c in $classes2)
+{
+    $classHL_1ES.add($count2,$c.FullName)
+    $count2++
+}
+$classHL_1ES
+
+
+ForEach ($objectA in $classHL_1ES.values) 
+{
+$InDestination = $true
+"1ES Entity: $objectA.Item($_)"
+#:outer
+ ForEach ($objectB in $classHL_CDM.values) 
+ {
+ if ($objectA -eq $objectB) 
+   {
+   $InDestination = $true
+           #"Same Code ! in $objectB"
+           break :outer
+           #Write-host –NoNewLine "strings are equal" 
+   }
+   else
+   {
+        #Write-host –NoNewLine "strings are unequal" $objectA + $objectB
+        #"Unequal Code ! $objectB"
+        $InDestination = $false
+  }
+  if($InDestination)
+  {
+    "Unequal Code ! $objectB"
+  }
+ }
+}
