@@ -1,0 +1,78 @@
+$V20_DLL1_1ES = $basePath + '\frmabhdishek\CDMBuild\Microsoft.Mom.UI.Common.dll'
+$V20_DLL1_CDMBuild = $basePath + '\frmabhdishek\Microsoft.Mom.UI.Common.dll'
+
+
+#implementation 1 ES
+$decompilerOBJ1 = Get-Decompiler $V20_DLL1_1ES
+$classesOBJ1 = Get-DecompiledTypes $decompilerOBJ1 -Types class
+$ArrayList1 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ1)
+{
+ $ArrayList1.Add($c.Namespace)
+}
+
+#Write-Host "Count of classes underneath different Namespaces in 1ES DLL are as below:"
+#$ArrayList1 | Group-Object -NoElement
+
+
+
+#implementation 1 ES
+$decompilerOBJ2 = Get-Decompiler $V20_DLL1_CDMBuild
+$classesOBJ2 = Get-DecompiledTypes $decompilerOBJ2 -Types class
+$ArrayList2 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ2)
+{
+ $ArrayList2.Add($c.Namespace)
+}
+
+#sort list by the property number
+$ArrayList1 = $ArrayList1 | sort-object -Property number
+
+#sort list by the property number
+$ArrayList2 = $ArrayList2 | sort-object -Property number
+
+Write-Host –NoNewLine "Count of classes underneath different Namespaces in 1ES DLL are as below:"
+$ArrayList1 | Group-Object name
+$ArrayList1 | Group-Object -NoElement
+Write-Host
+
+Write-Host "Count of classes underneath different Namespaces in CDMBuild are as below:"
+Write-Host "Count Name"                     
+Write-Host "----- ----"
+$ArrayList2 | Group-Object name
+$ArrayList2 | Group-Object -NoElement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#count differences and if differences greater than 0, do stuff
+[Int] $diff
+$properties = $ArrayList1 | Get-Member -MemberType Property | Select-Object -ExpandProperty Name
+
+foreach ($property in $properties) {
+    $diff = 0
+    $diff = (Compare-Object $ArrayList1 $ArrayList2 -Property "$property").count
+    if ($diff -ne 0) {
+        #do stuff
+        $diff
+    }
+    else {
+        #do something else
+    }
+}
+
+
+
