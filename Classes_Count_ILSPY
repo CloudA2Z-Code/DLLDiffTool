@@ -1,0 +1,31 @@
+$V20_DLL_1ES = $basePath + '\frmabhdishek\CDMBuild\Microsoft.EnterpriseManagement.Reporting.Code.dll'
+$V20_DLL_CDMBuild = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Reporting.Code.dll'
+
+
+#implementation 1 ES
+$decompilerOBJ1 = Get-Decompiler $V20_DLL_1ES
+$classesOBJ1 = Get-DecompiledTypes $decompiler1 -Types class
+$1ESALlist = New-Object System.Collections.ArrayList
+
+foreach ($c in $classes1)
+{
+ $recipients.Add($c.Namespace)
+}
+Write-Host "Count of classes underneath different Namespaces are as below:"
+$recipients | Group-Object -NoElement
+
+
+
+
+#implementation 1 ES
+$decompilerOBJ2 = Get-Decompiler $V20_DLL_CDMBuild
+$classesOBJ1 = Get-DecompiledTypes $decompiler1 -Types class
+$recipients = New-Object System.Collections.ArrayList
+
+foreach ($c in $classes1)
+{
+ $recipients.Add($c.Namespace)
+}
+ $recipients | Group-Object -NoElement
+
+
