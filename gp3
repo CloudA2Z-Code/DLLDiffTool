@@ -1,0 +1,68 @@
+#Need to take care of passing DLL with more namespaces in Array List1 for comaprison
+
+
+$V20_DLL1_1ES = $basePath + '\frmabhdishek\CDMBuild\Microsoft.Mom.UI.Common.dll'
+$V20_DLL1_CDMBuild = $basePath + '\frmabhdishek\Microsoft.Mom.UI.Common.dll'
+
+
+#implementation 1 ES
+$decompilerOBJ1 = Get-Decompiler $V20_DLL1_CDMBuild
+$classesOBJ1 = Get-DecompiledTypes $decompilerOBJ1 -Types class
+$ArrayList1 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ1)
+{
+ $ArrayList1.Add($c.Namespace)
+}
+
+
+#implementation 1 ES
+$decompilerOBJ2 = Get-Decompiler $V20_DLL1_1ES
+$classesOBJ2 = Get-DecompiledTypes $decompilerOBJ2 -Types class
+$ArrayList2 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ2)
+{
+ $ArrayList2.Add($c.Namespace)
+}
+
+
+
+$classHL_1ES = @{}
+$ArrayListFinal = New-Object System.Collections.ArrayList
+$IgnoredNamespacesFN = New-Object System.Collections.ArrayList
+#$count=0
+$temp
+foreach ($item in $ArrayList1) 
+{
+
+    "D-$item"
+    if (!($item -eq $null) -and $ArrayList2 -contains $item) 
+    {       
+        write-host "if loop: $item "           
+        $classHL_1ES[$item]++
+        #$count++              
+        
+     }
+     else
+     {
+      write-host "Else loop - Item not in other DLL"
+      $IgnoredNamespacesFN.Add($item)
+     }
+}
+
+
+write-host
+write-host " Namespace                                                         Hits "
+write-host " ---------                                                         -----"
+$classHL_1ES.Keys | % { " $_   --------------- " + $classHL_1ES.Item($_) }
+#$classHL_1ES.Keys | % { "Namespace = $_ , No. of hits= " + $classHL_1ES.Item($_) }
+
+write-host
+write-host "Common Namespaces among the DLLS :" $classHL_1ES.count
+write-host "Ommited Namespaces among the DLLS :" $IgnoredNamespacesFN.count
+
+write-host
+write-host "Namespaces which you have ommitted accidently are as below"
+write-host "----------------------------------------------------------"
+$IgnoredNamespacesFN
