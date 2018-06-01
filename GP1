@@ -1,0 +1,53 @@
+$V20_DLL1_1ES = $basePath + '\frmabhdishek\CDMBuild\Microsoft.Mom.UI.Common.dll'
+$V20_DLL1_CDMBuild = $basePath + '\frmabhdishek\Microsoft.Mom.UI.Common.dll'
+
+
+#implementation 1 ES
+$decompilerOBJ1 = Get-Decompiler $V20_DLL1_1ES
+$classesOBJ1 = Get-DecompiledTypes $decompilerOBJ1 -Types class
+$ArrayList1 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ1)
+{
+ $ArrayList1.Add($c.Namespace)
+}
+
+
+#implementation 1 ES
+$decompilerOBJ2 = Get-Decompiler $V20_DLL1_CDMBuild
+$classesOBJ2 = Get-DecompiledTypes $decompilerOBJ2 -Types class
+$ArrayList2 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ2)
+{
+ $ArrayList2.Add($c.Namespace)
+}
+
+
+
+$classHL_1ES = @{}
+$ArrayListFinal = New-Object System.Collections.ArrayList
+$IgnoredNamespacesFN = New-Object System.Collections.ArrayList
+#$count=0
+$temp
+foreach ($item in $ArrayList1) {
+if($item -match "System.Security.Cryptography")
+{
+    "D-$item"
+    if (!($item -eq $null) -and $ArrayList2 -contains $item) 
+    {       
+        write-host "if loop: $item "           
+        $classHL_1ES[$item]++
+        #$count++              
+        
+     }
+     else
+     {
+      write-host "Else loop - Item not in other DLL"
+      $IgnoredNamespacesFN.add($item + "Else loop - Item not in other DLL")
+     }
+     }
+}
+$classHL_1ES
+
+$classHL_1ES.Keys | % { "key = $_ , value = " + $classHL_1ES.Item($_) }
