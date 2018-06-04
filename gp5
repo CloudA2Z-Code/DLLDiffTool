@@ -1,0 +1,111 @@
+#Need to take care of passing DLL with more namespaces in Array List1 for comaprison
+
+
+$basePath = $PSScriptRoot
+if ([string]::IsNullOrEmpty($basePath))
+{
+    $basePath = Split-Path -parent $psISE.CurrentFile.Fullpath
+}
+
+$V20_DLL1_CDMBuild = $basePath + '\frmabhdishek\CDMBuild\Microsoft.Mom.UI.Common.dll'
+$V20_DLL1_1ES = $basePath + '\frmabhdishek\Microsoft.Mom.UI.Common.dll'
+
+
+#$V20_DLL1_1ES = $basePath + '\frmabhdishek\Microsoft.EnterpriseManagement.Modules.DataTypes.dll'
+#$V20_DLL1_CDMBuild = $basePath + '\frmabhdishek\CDMBuild\Microsoft.EnterpriseManagement.Modules.DataTypes.dll'
+
+#Displaying Target Frameworks for both the DLLS
+Write-host
+$dllTargetFMversion1 = [Reflection.Assembly]::ReflectionOnlyLoadFrom($V20_DLL1_1ES).ImageRuntimeVersion
+Write-host –NoNewLine "1ES DLL target Framework : " $dllTargetFMversion1
+Write-host
+$dllTargetFMversion2 = [Reflection.Assembly]::ReflectionOnlyLoadFrom($V20_DLL1_CDMBuild).ImageRuntimeVersion
+Write-host –NoNewLine "CDMBUILD DLL target Framework : " $dllTargetFMversion2
+Write-host
+
+$1ESFileSize = (Get-Item $V20_DLL1_1ES).length/1KB
+Write-host "1ES Dll Size $1ESFileSize KB" 
+$CDMBuildFileSize = (Get-Item $V20_DLL1_1ES).length/1KB 
+Write-host "CDM Build Dll Size $1ESFileSize KB"
+
+$FileSizeDiff = ($1ESFileSize - $CDMBuildFileSize) 
+Write-host "File Size Difference among the Dlls is"$FileSizeDiff"KB"
+
+#implementation CDMBUILD
+$decompilerOBJ1 = Get-Decompiler $V20_DLL1_CDMBuild
+$classesOBJ1 = Get-DecompiledTypes $decompilerOBJ1 -Types class
+$ArrayList1 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ1)
+{
+ $ArrayList1.Add($c.Namespace)
+}
+
+
+#implementation 1 ES
+$decompilerOBJ2 = Get-Decompiler $V20_DLL1_1ES
+$classesOBJ2 = Get-DecompiledTypes $decompilerOBJ2 -Types class
+$ArrayList2 = New-Object System.Collections.ArrayList
+
+foreach ($c in $classesOBJ2)
+{
+ $ArrayList2.Add($c.Namespace)
+}
+
+
+$classHL_1ES = @{}
+$ArrayListFinal = New-Object System.Collections.ArrayList
+$IgnoredNamespacesFN = New-Object System.Collections.ArrayList
+#$count=0
+$temp
+$ALCount1=0
+$ALCount2=0
+foreach ($item in $ArrayList1) 
+{
+    $ALCount1++
+    #"D-$item"
+    if (!($item -eq $null) -and $ArrayList2 -contains $item) 
+    {       
+        #write-host "if loop: $item "           
+        $classHL_1ES[$item]++
+        #$count++           
+    }
+    else
+    {
+      "D-$item"
+      #write-host "Else loop - Item not in other DLL"
+      $IgnoredNamespacesFN.Add($item)
+      $ALCount2++
+    }
+}
+
+
+write-host
+write-host " Namespace                                                         Hits "
+write-host " ---------                                                         -----"
+$classHL_1ES.Keys | % { " $_   --------------- " + $classHL_1ES.Item($_) }
+#$classHL_1ES.Keys | % { "Namespace = $_ , No. of hits= " + $classHL_1ES.Item($_) }
+
+write-host
+write-host "Common Namespaces among the DLLS :" $classHL_1ES.count
+write-host "Ommited Namespaces among the DLLS :" $IgnoredNamespacesFN.count
+
+write-host
+write-host "Namespaces which you have ommitted accidently are as below"
+write-host "----------------------------------------------------------"
+$IgnoredNamespacesFN
+
+Write-Host
+$clounFin = $classesOBJ1.Count - $classesOBJ2.Count
+Write-Host "Total No. of entities difference among the DLLS: $clounFin" 
+
+
+
+Write-Host
+$ArrayList1 | Group-Object -NoElement
+Write-Host
+
+$ArrayList2 | Group-Object -NoElement
+Write-Host
+
+
